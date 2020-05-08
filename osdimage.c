@@ -109,7 +109,6 @@ void OsdImage::SetOsdSize() {
 #ifdef TESTPIXMAP
     if (pixmap == nullptr) {
         fprintf(stderr, "== pixmap is null ==\n");
-        resizeOsd = true;
         return;
     }
 #endif
