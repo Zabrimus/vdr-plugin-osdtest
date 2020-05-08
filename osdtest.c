@@ -91,7 +91,6 @@ void cPluginOsdtest::MainThreadHook(void)
     if (osdImage != NULL) {
         static int osdState = 0;
         if (cOsdProvider::OsdSizeChanged(osdState)) {
-            fprintf(stderr, "Plugin: TriggerOsdResize\n");
             osdImage->TriggerOsdResize();
         }
     }

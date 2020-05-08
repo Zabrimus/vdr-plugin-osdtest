@@ -13,8 +13,8 @@ extern "C" {
 #include <unistd.h>
 #include "osdimage.h"
 
-// scale image
 #define SCALEOSD
+#define TESTPIXMAP
 
 OsdImage *osdImage;
 
@@ -88,12 +88,14 @@ void OsdImage::TriggerOsdResize() {
 void OsdImage::SetOsdSize() {
     fprintf(stderr, "OsdImage SetOsdSize()\n");
 
+    /*
     if (pixmap != nullptr) {
         fprintf(stderr, "OsdImage SetOsdSize, Destroy old pixmap\n");
 
         osd->DestroyPixmap(pixmap);
         pixmap = nullptr;
     }
+    */
 
     fprintf(stderr, "OsdImage SetOsdSize, Get new OSD size\n");
     double ph;
@@ -103,6 +105,14 @@ void OsdImage::SetOsdSize() {
     // try to get a pixmap
     fprintf(stderr, "OsdImage SetOsdSize, Create pixmap %dx%d\n", disp_width, disp_height);
     pixmap = osd->CreatePixmap(0, rect, rect);
+
+#ifdef TESTPIXMAP
+    if (pixmap == nullptr) {
+        fprintf(stderr, "== pixmap is null ==\n");
+        resizeOsd = true;
+        return;
+    }
+#endif
 
     fprintf(stderr, "OsdImage SetOsdSize, Clear Pixmap\n");
     pixmap->Lock();
