@@ -57,7 +57,7 @@ OBJS = $(PLUGIN).o osdimage.o
 
 # ffmpeg libswscale
 CXXFLAGS += $(shell pkg-config --cflags libswscale)
-LDFLAGS += $(shell pkg-config --libs libswscale)
+LIBS += $(shell pkg-config --libs libswscale)
 
 ### The main target:
 
@@ -111,7 +111,7 @@ install-i18n: $(I18Nmsgs)
 
 $(SOFILE): $(OBJS)
 	@echo LD $@
-	$(Q)$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) -o $@
+	$(Q)$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
 
 install-lib: $(SOFILE)
 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)

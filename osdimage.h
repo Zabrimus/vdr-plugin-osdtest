@@ -22,6 +22,9 @@ public:
     OsdImage();
     ~OsdImage() override;
     void Show() override;
+
+    void Display();
+
     void SetOsdSize();
     void TriggerOsdResize();
 

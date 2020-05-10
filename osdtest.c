@@ -13,10 +13,12 @@ static const char *VERSION        = "0.0.1";
 static const char *DESCRIPTION    = "Enter description for 'osdtest' plugin";
 static const char *MAINMENUENTRY  = "Osdtest";
 
-
 class cPluginOsdtest : public cPlugin {
 private:
   // Add any member variables or functions you may need here.
+  int lastDisplayWidth = 0;
+  int lastDisplayHeight = 0;
+
 public:
   cPluginOsdtest(void);
   virtual ~cPluginOsdtest();
@@ -91,7 +93,21 @@ void cPluginOsdtest::MainThreadHook(void)
     if (osdImage != NULL) {
         static int osdState = 0;
         if (cOsdProvider::OsdSizeChanged(osdState)) {
-            osdImage->TriggerOsdResize();
+            int newWidth;
+            int newHeight;
+            double ph;
+            cDevice::PrimaryDevice()->GetOsdSize(newWidth, newHeight, ph);
+
+            if (newWidth != lastDisplayWidth || newHeight != lastDisplayHeight) {
+                fprintf(stderr, "Old Size: %dx%d, New Size. %dx%d\n", lastDisplayWidth, lastDisplayHeight, newWidth, newHeight);
+                lastDisplayWidth = newWidth;
+                lastDisplayHeight = newHeight;
+
+                fprintf(stderr, "MainThreadHook => Display()");
+                osdImage->Display();
+            }
+
+            // osdImage->TriggerOsdResize();
         }
     }
 }

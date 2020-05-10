@@ -1,0 +1,26 @@
+[
+ {
+  "directory": "/home/rh/idea/vdr-2.4.0/PLUGINS/src/osdtest", 
+  "arguments": [
+   "g++", 
+   "-g", 
+   "-O3", 
+   "-Wall", 
+   "-Werror=overloaded-virtual", 
+   "-Wno-parentheses", 
+   "-O0", 
+   "-fPIC", 
+   "-D_GNU_SOURCE", 
+   "-D_FILE_OFFSET_BITS=64", 
+   "-D_LARGEFILE_SOURCE", 
+   "-D_LARGEFILE64_SOURCE", 
+   "-I/home/rh/idea/vdr-2.4.0/include", 
+   "-c", 
+   "-DPLUGIN_NAME_I18N=osdtest", 
+   "-o", 
+   "osdtest.o", 
+   "osdtest.c"
+  ], 
+  "file": "osdtest.c"
+ }
+]

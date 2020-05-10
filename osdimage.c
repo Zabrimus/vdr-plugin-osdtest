@@ -22,7 +22,7 @@ uint8_t testImage[1280 * 720 * 4];
 struct SwsContext *swsCtx = nullptr;
 
 OsdImage::OsdImage() {
-    fprintf(stderr, "Construct OsdImage...\n");
+    fprintf(stderr, "==> Construct OsdImage...\n");
 
     osd = nullptr;
     pixmap = nullptr;
@@ -49,15 +49,23 @@ OsdImage::~OsdImage() {
 }
 
 void OsdImage::Show() {
-    fprintf(stderr, "OsdImage Show()\n");
+    fprintf(stderr, "==> OsdImage Show()\n");
+    Display();
+}
+
+void OsdImage::Display() {
+    fprintf(stderr, "==> Display\n");
+    if (osd) {
+        delete osd;
+    }
 
     osd = cOsdProvider::NewOsd(0, 0);
 
     tArea areas[] = {
-        {0, 0, 4096 - 1, 2160 - 1, 32}, // 4K
-        {0, 0, 2560 - 1, 1440 - 1, 32}, // 2K
-        {0, 0, 1920 - 1, 1080 - 1, 32}, // Full HD
-        {0, 0, 1280 - 1,  720 - 1, 32}, // 720p
+            {0, 0, 4096 - 1, 2160 - 1, 32}, // 4K
+            {0, 0, 2560 - 1, 1440 - 1, 32}, // 2K
+            {0, 0, 1920 - 1, 1080 - 1, 32}, // Full HD
+            {0, 0, 1280 - 1,  720 - 1, 32}, // 720p
     };
 
     // set the maximum area size to 4K
@@ -100,6 +108,13 @@ void OsdImage::SetOsdSize() {
     fprintf(stderr, "OsdImage SetOsdSize, Get new OSD size\n");
     double ph;
     cDevice::PrimaryDevice()->GetOsdSize(disp_width, disp_height, ph);
+
+    if (disp_width <= 0 || disp_height <= 0 || disp_width > 4096 || disp_height > 2160) {
+        fprintf(stderr, "hbbtv: Got illegal OSD size %dx%d", disp_width, disp_height);
+        pixmap = nullptr;
+        return;
+    }
+
     cRect rect(0, 0, disp_width, disp_height);
 
     // try to get a pixmap
@@ -142,6 +157,11 @@ void OsdImage::readOsdUpdate() {
         fprintf(stderr, "OsdImage readOsdUpdate, setOsdSize\n");
         SetOsdSize();
         resizeOsd = false;
+    }
+
+    if (disp_width <= 0 || disp_height <= 0 || disp_width > 4096 || disp_height > 2160) {
+        fprintf(stderr, "hbbtv: Got illegal OSD size %dx%d", disp_width, disp_height);
+        return;
     }
 
 #ifdef SCALEOSD
