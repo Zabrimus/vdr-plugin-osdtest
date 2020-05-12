@@ -14,8 +14,8 @@ private:
     cPixmap *pixmap;
     cOsd* osd;
 
-    int disp_width;
-    int disp_height;
+    int disp_width = 100;
+    int disp_height = 100;
     bool resizeOsd;
 
 public:

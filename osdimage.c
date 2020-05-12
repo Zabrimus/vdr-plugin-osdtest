@@ -62,13 +62,12 @@ void OsdImage::Display() {
     osd = cOsdProvider::NewOsd(0, 0);
 
     tArea areas[] = {
-            {0, 0, 4096 - 1, 2160 - 1, 32}, // 4K
+            {0, 0, 3840 - 1, 2160 - 1, 32}, // 4K2K
             {0, 0, 2560 - 1, 1440 - 1, 32}, // 2K
             {0, 0, 1920 - 1, 1080 - 1, 32}, // Full HD
             {0, 0, 1280 - 1,  720 - 1, 32}, // 720p
     };
 
-    // set the maximum area size to 4K
     bool areaFound = false;
     for (int i = 0; i < 4; ++i) {
         auto areaResult = osd->SetAreas(&areas[i], 1);
