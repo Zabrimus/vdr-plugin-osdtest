@@ -14,7 +14,6 @@ extern "C" {
 #include "osdimage.h"
 
 #define SCALEOSD
-#define TESTPIXMAP
 
 OsdImage *osdImage;
 
@@ -61,28 +60,6 @@ void OsdImage::Display() {
 
     osd = cOsdProvider::NewOsd(0, 0);
 
-    tArea areas[] = {
-            {0, 0, 3840 - 1, 2160 - 1, 32}, // 4K2K
-            {0, 0, 2560 - 1, 1440 - 1, 32}, // 2K
-            {0, 0, 1920 - 1, 1080 - 1, 32}, // Full HD
-            {0, 0, 1280 - 1,  720 - 1, 32}, // 720p
-    };
-
-    bool areaFound = false;
-    for (int i = 0; i < 4; ++i) {
-        auto areaResult = osd->SetAreas(&areas[i], 1);
-
-        if (areaResult == oeOk) {
-            fprintf(stderr, "Area size set to %d:%d - %d:%d\n", areas[i].x1, areas[i].y1, areas[i].x2, areas[i].y2);
-            areaFound = true;
-            break;
-        }
-    }
-
-    if (!areaFound) {
-        fprintf(stderr, "Unable set any OSD area. OSD will not be created\n");
-    }
-
     SetOsdSize();
 }
 
@@ -95,16 +72,6 @@ void OsdImage::TriggerOsdResize() {
 void OsdImage::SetOsdSize() {
     fprintf(stderr, "OsdImage SetOsdSize()\n");
 
-    /*
-    if (pixmap != nullptr) {
-        fprintf(stderr, "OsdImage SetOsdSize, Destroy old pixmap\n");
-
-        osd->DestroyPixmap(pixmap);
-        pixmap = nullptr;
-    }
-    */
-
-    fprintf(stderr, "OsdImage SetOsdSize, Get new OSD size\n");
     double ph;
     cDevice::PrimaryDevice()->GetOsdSize(disp_width, disp_height, ph);
 
@@ -116,16 +83,21 @@ void OsdImage::SetOsdSize() {
 
     cRect rect(0, 0, disp_width, disp_height);
 
-    // try to get a pixmap
-    fprintf(stderr, "OsdImage SetOsdSize, Create pixmap %dx%d\n", disp_width, disp_height);
-    pixmap = osd->CreatePixmap(0, rect, rect);
+    tArea area  = {0, 0, disp_width - 1, disp_height - 1, 32};
+    auto areaResult = osd->SetAreas(&area, 1);
 
-#ifdef TESTPIXMAP
+    if (areaResult == oeOk) {
+        fprintf(stderr, "Area size set to %d:%d - %d:%d\n", area.x1, area.y1, area.x2, area.y2);
+
+        // try to get a pixmap
+        fprintf(stderr, "OsdImage SetOsdSize, Create pixmap %dx%d\n", disp_width, disp_height);
+        pixmap = osd->CreatePixmap(0, rect, rect);
+    }
+
     if (pixmap == nullptr) {
         fprintf(stderr, "== pixmap is null ==\n");
         return;
     }
-#endif
 
     fprintf(stderr, "OsdImage SetOsdSize, Clear Pixmap\n");
     pixmap->Lock();
