@@ -13,6 +13,7 @@ extern "C" {
 #include <unistd.h>
 #include "osdimage.h"
 
+#define SET_AREA_VERY_EARLY
 #define SCALEOSD
 
 OsdImage *osdImage;
@@ -60,6 +61,29 @@ void OsdImage::Display() {
 
     osd = cOsdProvider::NewOsd(0, 0);
 
+#ifdef SET_AREA_VERY_EARLY
+    tArea areas[] = {
+            {0, 0, 3840 - 1, 2160 - 1, 32}, // 4K2K
+            {0, 0, 2560 - 1, 1440 - 1, 32}, // 2K
+            {0, 0, 1920 - 1, 1080 - 1, 32}, // Full HD
+            {0, 0, 1280 - 1,  720 - 1, 32}, // 720p
+    };
+
+    bool areaFound = false;
+    for (int i = 0; i < 4; ++i) {
+        auto areaResult = osd->SetAreas(&areas[i], 1);
+
+        if (areaResult == oeOk) {
+            fprintf(stderr, "Area size set to %d:%d - %d:%d\n", areas[i].x1, areas[i].y1, areas[i].x2, areas[i].y2);
+            areaFound = true;
+            break;
+        }
+    }
+
+    if (!areaFound) {
+        fprintf(stderr, "Unable set any OSD area. OSD will not be created\n");
+    }
+#endif
     SetOsdSize();
 }
 
@@ -83,16 +107,19 @@ void OsdImage::SetOsdSize() {
 
     cRect rect(0, 0, disp_width, disp_height);
 
+#ifndef SET_AREA_VERY_EARLY
     tArea area  = {0, 0, disp_width - 1, disp_height - 1, 32};
     auto areaResult = osd->SetAreas(&area, 1);
 
     if (areaResult == oeOk) {
         fprintf(stderr, "Area size set to %d:%d - %d:%d\n", area.x1, area.y1, area.x2, area.y2);
-
-        // try to get a pixmap
-        fprintf(stderr, "OsdImage SetOsdSize, Create pixmap %dx%d\n", disp_width, disp_height);
-        pixmap = osd->CreatePixmap(0, rect, rect);
+        return;
     }
+#endif
+
+    // try to get a pixmap
+    fprintf(stderr, "OsdImage SetOsdSize, Create pixmap %dx%d\n", disp_width, disp_height);
+    pixmap = osd->CreatePixmap(0, rect, rect);
 
     if (pixmap == nullptr) {
         fprintf(stderr, "== pixmap is null ==\n");
